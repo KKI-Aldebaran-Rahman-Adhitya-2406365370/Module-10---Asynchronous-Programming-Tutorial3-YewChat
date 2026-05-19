@@ -134,52 +134,69 @@ impl Component for Chat {
             }
         }
     }
-
     fn view(&self, ctx: &Context<Self>) -> Html {
         let submit = ctx.link().callback(|_| Msg::SubmitMessage);
 
         html! {
-            <div class="flex w-screen">
-                <div class="flex-none w-56 h-screen bg-gray-100">
-                    <div class="text-xl p-3">{"Users"}</div>
-                    {
-                        self.users.clone().iter().map(|u| {
-                            html!{
-                                <div class="flex m-3 bg-white rounded-lg p-2">
-                                    <div>
-                                        <img class="w-12 h-12 rounded-full" src={u.avatar.clone()} alt="avatar"/>
-                                    </div>
-                                    <div class="flex-grow p-3">
-                                        <div class="flex text-xs justify-between">
-                                            <div>{u.name.clone()}</div>
+            <div style="display: flex; width: 100vw; height: 100vh; background-color: #050a05; color: #39ff14; font-family: 'Courier New', Courier, monospace; overflow: hidden;">
+
+                // COLUMN A: Users List
+                <div style="flex: none; width: 280px; background-color: #000000; border-right: 2px solid #005500; display: flex; flex-direction: column;">
+                    <div style="font-size: 1.25rem; padding: 15px; border-bottom: 2px solid #005500; text-shadow: 0 0 10px #39ff14; letter-spacing: 2px; font-weight: bold;">
+                        {"> CONNECTED_NODES"}
+                    </div>
+                    <div style="overflow-y: auto; flex-grow: 1;">
+                        {
+                            self.users.clone().iter().map(|u| {
+                                html!{
+                                    <div style="display: flex; align-items: center; margin: 15px; background-color: #001100; border: 1px solid #004400; padding: 10px; box-shadow: 0 0 8px rgba(57,255,20,0.15);">
+                                        <div>
+                                            // The filter property turns the standard avatars into green glowing holograms
+                                            <img style="width: 45px; height: 45px; border-radius: 50%; border: 1px solid #39ff14; filter: sepia(100%) hue-rotate(70deg) saturate(300%);" src={u.avatar.clone()} alt="avatar"/>
                                         </div>
-                                        <div class="text-xs text-gray-400">
-                                            {"Hi there!"}
+                                        <div style="flex-grow: 1; padding-left: 15px;">
+                                            <div style="font-size: 0.95rem; font-weight: bold; text-transform: uppercase;">
+                                                {u.name.clone()}
+                                            </div>
+                                            <div style="font-size: 0.75rem; color: #00aa00; margin-top: 3px;">
+                                                {"[SECURE_LINK_ACTIVE]"}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            }
-                        }).collect::<Html>()
-                    }
+                                }
+                            }).collect::<Html>()
+                        }
+                    </div>
                 </div>
-                <div class="grow h-screen flex flex-col">
-                    <div class="w-full h-14 border-b-2 border-gray-300"><div class="text-xl p-3">{"💬 Chat!"}</div></div>
-                    <div class="w-full grow overflow-auto border-b-2 border-gray-300">
+
+                // COLUMN B: Chat Area
+                <div style="flex-grow: 1; display: flex; flex-direction: column; height: 100vh;">
+
+                    // Header
+                    <div style="width: 100%; height: 60px; border-bottom: 2px solid #005500; display: flex; align-items: center; padding: 0 20px; background-color: #020502;">
+                        <div style="font-size: 1.25rem; text-shadow: 0 0 10px #39ff14; font-weight: bold;">{"[ SYS.NET_RELAY_ESTABLISHED ]"}</div>
+                    </div>
+
+                    // Messages Scroll Area
+                    <div style="width: 100%; flex-grow: 1; overflow-y: auto; padding: 25px; background-color: #050a05; display: flex; flex-direction: column;">
                         {
                             self.messages.iter().map(|m| {
-                                let user = self.users.iter().find(|u| u.name == m.from).unwrap();
+                                // Safely lookup user to prevent panic if a user disconnects but their message remains
+                                let user_avatar = self.users.iter().find(|u| u.name == m.from).map(|u| u.avatar.clone()).unwrap_or_else(|| "https://avatars.dicebear.com/api/adventurer-neutral/unknown.svg".to_string());
+
                                 html!{
-                                    <div class="flex items-end w-3/6 bg-gray-100 m-8 rounded-tl-lg rounded-tr-lg rounded-br-lg ">
-                                        <img class="w-8 h-8 rounded-full m-3" src={user.avatar.clone()} alt="avatar"/>
-                                        <div class="p-3">
-                                            <div class="text-sm">
-                                                {m.from.clone()}
+                                    <div style="display: flex; align-items: flex-start; width: 65%; background-color: #001100; margin-bottom: 20px; padding: 15px; border: 1px solid #005500; border-left: 4px solid #39ff14; box-shadow: 0 2px 10px rgba(57, 255, 20, 0.05);">
+                                        <img style="width: 40px; height: 40px; border-radius: 50%; filter: sepia(100%) hue-rotate(70deg) saturate(300%); margin-right: 15px; border: 1px solid #005500;" src={user_avatar} alt="avatar"/>
+                                        <div style="width: 100%;">
+                                            <div style="font-size: 0.9rem; font-weight: bold; color: #00ff00; margin-bottom: 8px; border-bottom: 1px dashed #004400; padding-bottom: 4px;">
+                                                {"> "}{m.from.clone()}
                                             </div>
-                                            <div class="text-xs text-gray-500">
+                                            <div style="font-size: 1rem; color: #39ff14; line-height: 1.4;">
+                                                // Preserving your exact GIF rendering logic
                                                 if m.message.ends_with(".gif") {
-                                                    <img class="mt-3" src={m.message.clone()}/>
+                                                    <img style="margin-top: 10px; border: 1px solid #005500; max-width: 100%;" src={m.message.clone()}/>
                                                 } else {
-                                                    {m.message.clone()}
+                                                    <span>{m.message.clone()}</span>
                                                 }
                                             </div>
                                         </div>
@@ -187,14 +204,18 @@ impl Component for Chat {
                                 }
                             }).collect::<Html>()
                         }
-
                     </div>
-                    <div class="w-full h-14 flex px-3 items-center">
-                        <input ref={self.chat_input.clone()} type="text" placeholder="Message" class="block w-full py-2 pl-4 mx-3 bg-gray-100 rounded-full outline-none focus:text-gray-700" name="message" required=true />
-                        <button onclick={submit} class="p-3 shadow-sm bg-blue-600 w-10 h-10 rounded-full flex justify-center items-center color-white">
-                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="fill-white">
-                                <path d="M0 0h24v24H0z" fill="none"></path><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
-                            </svg>
+
+                    // Input Area
+                    <div style="width: 100%; height: 80px; display: flex; align-items: center; padding: 0 25px; background-color: #000000; border-top: 2px solid #005500;">
+                        <span style="font-weight: bold; margin-right: 15px; font-size: 1.2rem;">{">"}</span>
+
+                        // Bound perfectly to your self.chat_input NodeRef
+                        <input ref={self.chat_input.clone()} type="text" placeholder="Transmit payload..." style="flex-grow: 1; padding: 15px; background-color: transparent; border: 1px solid #008800; color: #39ff14; outline: none; font-family: 'Courier New', Courier, monospace; font-size: 1rem; box-shadow: inset 0 0 10px rgba(0,255,0,0.1);" name="message" required=true />
+
+                        // Bound perfectly to your submit callback
+                        <button onclick={submit} style="padding: 15px 30px; margin-left: 20px; background-color: #003300; border: 1px solid #39ff14; color: #39ff14; cursor: pointer; font-weight: bold; font-size: 1rem; font-family: 'Courier New', Courier, monospace; box-shadow: 0 0 15px rgba(57,255,20,0.3); text-transform: uppercase;">
+                            {"EXEC"}
                         </button>
                     </div>
                 </div>

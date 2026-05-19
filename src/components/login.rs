@@ -27,13 +27,15 @@ pub fn login() -> Html {
     };
 
     html! {
-       <div class="bg-gray-800 flex w-screen">
-            <div class="container mx-auto flex flex-col justify-center items-center">
-                <form class="m-4 flex">
-                    <input {oninput} class="rounded-l-lg p-4 border-t mr-0 border-b border-l text-gray-800 border-gray-200 bg-white" placeholder="Username" />
-                    <Link<Route> to={Route::Chat}> <button {onclick} disabled={username.len()<1} class="px-8 rounded-r-lg bg-violet-600	  text-white font-bold p-4 uppercase border-violet-600 border-t border-b border-r" >{"Go Chatting!"}</button></Link<Route>>
-                </form>
-            </div>
+        <div style="text-align: center; margin-top: 10vh; border: 2px solid #005500; padding: 50px; display: inline-block; box-shadow: 0 0 20px rgba(57,255,20,0.1);">
+            <h1 style="text-shadow: 0 0 10px #39ff14; letter-spacing: 5px; margin-bottom: 5px;">{"[ SYS.NET_TERMINAL ]"}</h1>
+            <p style="color: #00aa00; margin-bottom: 30px;">{"> AWAITING USER IDENTIFICATION..."}</p>
+
+            <input type="text" placeholder="root@alias:~$" value={(*username).clone()} oninput={oninput} style="margin-right: 10px;" />
+
+            <Link<Route> to={Route::Chat}>
+                <button disabled={username.len() < 2} onclick={onclick}>{"INITIATE"}</button>
+            </Link<Route>>
         </div>
     }
 }
